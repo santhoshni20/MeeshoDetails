@@ -2,15 +2,16 @@
     ViewData["Title"] = "Welcome";
 }
 
-<div class="container d-flex flex-column align-items-center justify-content-center" style="min-height: 70vh;">
-    <div class="text-center">
+<div class="container py-5">
+    <div class="text-center mb-5">
         <!-- Welcoming title with premium styling -->
-        <h1 class="hero-title mb-5">Welcome to MeeshoDetails</h1>
+        <h1 class="hero-title">Meesho Dashboard & Ledger Hub</h1>
+        <p class="hero-subtitle">Real-time overview of listing stocks, investments, and net profit margins.</p>
         
-        <!-- Stylish Product Details button linking to /Home/ProductDetails -->
-        <div class="mt-4">
-            <a asp-controller="ProductDetails" asp-action="productDetails" class="btn-premium btn-lg px-5 py-3 fs-4 shadow-lg">
-                <span>Product Details</span>
+        <!-- Stylish Product Details button linking to /ProductDetails/productDetails -->
+        <div class="mt-2">
+            <a asp-controller="ProductDetails" asp-action="productDetails" class="btn-premium btn-lg px-5 py-3 fs-5 shadow-lg">
+                <span>Go to Product Details Ledger</span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="ms-2">
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                     <polyline points="12 5 19 12 12 19"></polyline>
@@ -18,4 +19,134 @@
             </a>
         </div>
     </div>
+
+    <!-- Dashboard Stats Grid -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4 mt-4">
+        <!-- Card 1: Total Products -->
+        <div class="col">
+            <div class="glass-card stat-card p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted fs-7 text-uppercase fw-semibold mb-1">Number of Products</p>
+                        <h3 id="statTotalProducts" class="text-white fw-bold mb-0">-</h3>
+                    </div>
+                    <div class="stat-icon-wrapper bg-pink-gradient">
+                        <span class="fs-4">📦</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2: Out of Stock -->
+        <div class="col">
+            <div class="glass-card stat-card p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted fs-7 text-uppercase fw-semibold mb-1">Out Of Stock</p>
+                        <h3 id="statOutOfStock" class="text-white fw-bold mb-0">-</h3>
+                    </div>
+                    <div class="stat-icon-wrapper bg-orange-gradient">
+                        <span class="fs-4">⚠️</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3: Total Invested -->
+        <div class="col">
+            <div class="glass-card stat-card p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted fs-7 text-uppercase fw-semibold mb-1">Total Invested Amount</p>
+                        <h3 id="statTotalInvested" class="text-white fw-bold mb-0">-</h3>
+                    </div>
+                    <div class="stat-icon-wrapper bg-blue-gradient">
+                        <span class="fs-4">💰</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4: Total Profit -->
+        <div class="col">
+            <div class="glass-card stat-card p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted fs-7 text-uppercase fw-semibold mb-1">Total Profit</p>
+                        <h3 id="statTotalProfit" class="text-white fw-bold mb-0">-</h3>
+                    </div>
+                    <div class="stat-icon-wrapper bg-green-gradient">
+                        <span class="fs-4">📈</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        loadDashboardStats();
+    });
+
+    function loadDashboardStats() {
+        fetch('/ProductDetails/getDashboardStats')
+            .then(res => res.json())
+            .then(res => {
+                if (res.statusCode === 200) {
+                    const stats = res.data;
+                    document.getElementById("statTotalProducts").textContent = stats.totalProductsCount.toLocaleString();
+                    document.getElementById("statOutOfStock").textContent = stats.outOfStockCount.toLocaleString();
+                    document.getElementById("statTotalInvested").textContent = "₹" + stats.totalInvestedAmount.toLocaleString('en-IN');
+                    
+                    const profitEl = document.getElementById("statTotalProfit");
+                    profitEl.textContent = "₹" + stats.totalProfit.toLocaleString('en-IN');
+                    
+                    if (stats.totalProfit >= 0) {
+                        profitEl.className = "fw-bold mb-0 text-success";
+                    } else {
+                        profitEl.className = "fw-bold mb-0 text-danger";
+                    }
+                } else {
+                    console.error("Failed to load dashboard stats: " + res.message);
+                }
+            })
+            .catch(err => {
+                console.error("Error loading dashboard stats:", err);
+            });
+    }
+</script>
+}
+
+<style>
+    .stat-card {
+        border-radius: 16px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    .stat-icon-wrapper {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .bg-pink-gradient {
+        background: linear-gradient(135deg, #ff477e 0%, #ff80a0 100%);
+    }
+    .bg-orange-gradient {
+        background: linear-gradient(135deg, #ff9233 0%, #ffb366 100%);
+    }
+    .bg-blue-gradient {
+        background: linear-gradient(135deg, #7000ff 0%, #a066ff 100%);
+    }
+    .bg-green-gradient {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+</style>

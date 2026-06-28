@@ -165,5 +165,18 @@ namespace MeeshoDetails.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<dashboardStatsDTO> getDashboardStats()
+        {
+            var products = await _context.products.ToListAsync();
+            
+            return new dashboardStatsDTO
+            {
+                totalProductsCount = products.Sum(p => p.stock),
+                outOfStockCount = products.Count(p => p.stock <= 0),
+                totalInvestedAmount = products.Sum(p => p.investedAmount),
+                totalProfit = products.Sum(p => p.profitAmount)
+            };
+        }
     }
 }

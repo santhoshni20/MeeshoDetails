@@ -11,5 +11,6 @@ namespace MeeshoDetails.Interfaces
         Task<bool> updateProduct(productDTO dto);
         Task<bool> editProduct(updateProductDTO dto);
         Task<bool> deleteProduct(int productId);
+        Task<dashboardStatsDTO> getDashboardStats();
     }
 }

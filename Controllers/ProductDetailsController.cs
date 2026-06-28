@@ -189,5 +189,32 @@ namespace MeeshoDetails.Controllers
                 });
             }
         }
+
+        // API Endpoint to get dashboard stats
+        [HttpGet]
+        public async Task<IActionResult> getDashboardStats()
+        {
+            try
+            {
+                var stats = await _productRepository.getDashboardStats();
+                var response = new apiResponseDTO
+                {
+                    statusCode = 200,
+                    message = "Stats retrieved successfully",
+                    data = stats
+                };
+                return Json(response);
+            }
+            catch (Exception ex)
+            {
+                var response = new apiResponseDTO
+                {
+                    statusCode = 500,
+                    message = "Failed to retrieve dashboard stats",
+                    errorDetails = ex.Message
+                };
+                return Json(response);
+            }
+        }
     }
 }
