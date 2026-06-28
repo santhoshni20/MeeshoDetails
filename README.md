@@ -25,7 +25,7 @@ This project follows a clean repository and service pattern architecture:
 
 ### Database Setup
 
-Run the SQL script located at `MeeshoDetails/CreateTables.sql` in your SQL Server database to create the necessary tables:
+Run the SQL script located at `CreateTables.sql` in your SQL Server database to create the necessary tables:
 *   `Sellers`
 *   `Products`
 *   `Orders`
