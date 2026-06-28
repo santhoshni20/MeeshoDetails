@@ -16,6 +16,7 @@
   --input-bg: rgba(30, 30, 35, 0.7);
   --input-border: rgba(255, 255, 255, 0.12);
   --input-text: #ffffff;
+  --btn-close-filter: invert(1) grayscale(1) brightness(2);
 }
 
 [data-theme="light"] {
@@ -30,6 +31,7 @@
   --input-bg: #ffffff;
   --input-border: rgba(0, 0, 0, 0.15);
   --input-text: #1e293b;
+  --btn-close-filter: none;
 }
 
 body {
@@ -93,6 +95,26 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-muted) !important;
   font-weight: 600;
   letter-spacing: 0.5px;
+}
+
+.btn-close {
+  filter: var(--btn-close-filter) !important;
+}
+
+.breadcrumb-item.active {
+  color: var(--text-main) !important;
+}
+
+.breadcrumb-item a {
+  color: var(--text-muted) !important;
+}
+
+.breadcrumb-item a:hover {
+  color: var(--accent-pink) !important;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+  color: var(--text-muted) !important;
 }
 
 .form-control, .form-select {
@@ -197,7 +219,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Table styles */
-.table {
+.table, .table > :not(caption) > * > * {
   color: var(--text-main) !important;
 }
 
