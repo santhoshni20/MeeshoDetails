@@ -33,6 +33,7 @@ builder.Services.AddScoped<ICampaignsRepository, CampaignsRepository>();
 builder.Services.AddScoped<IInfluencersStatRepository, InfluencersStatRepository>();
 builder.Services.AddScoped<IReportsRepository, ReportsRepository>();
 builder.Services.AddScoped<ISettingsRepository, SettingsRepository>();
+builder.Services.AddScoped<MeeshoDetails.Interfaces.IProductDetailsRepository, MeeshoDetails.Repositories.ProductDetailsRepository>();
 
 // Register Middlewares
 builder.Services.AddTransient<GlobalExceptionHandlingMiddleware>();

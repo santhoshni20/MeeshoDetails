@@ -1,6 +1,14 @@
-﻿namespace MeeshoDetails.Interfaces
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using MeeshoDetails.DTOs;
+
+namespace MeeshoDetails.Interfaces
 {
     public interface IProductDetailsRepository
     {
+        Task<List<productDTO>> getProducts();
+        Task<productDTO> addProduct(saveProductDTO dto);
+        Task<bool> updateProduct(productDTO dto);
+        Task<bool> deleteProduct(int productId);
     }
 }

@@ -11,11 +11,6 @@ namespace MeeshoDetails.Controllers
             return View();
         }
 
-        public IActionResult ProductDetails()
-        {
-            return View("~/Views/Product Details/ProductDetails.cshtml");
-        }
-
         public IActionResult Privacy()
         {
             return View();
