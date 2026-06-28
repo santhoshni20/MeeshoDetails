@@ -8,7 +8,7 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none text-muted">Home</a></li>
-                <li class="breadcrumb-item active text-white" aria-current="page">Product Details Ledger</li>
+                <li class="breadcrumb-item active" aria-current="page">Product Details Ledger</li>
             </ol>
         </nav>
         <a asp-controller="Home" asp-action="Index" class="btn-outline-premium btn-sm">
@@ -19,14 +19,14 @@
 
     <!-- Header Section -->
     <div class="mb-4">
-        <h1 class="text-white fw-bold">Meesho Product Details & Financial Ledger</h1>
+        <h1 class="fw-bold">Meesho Product Details & Financial Ledger</h1>
         <p class="text-muted">Track stock, shipment timelines, investments, credits, profits, and payment clearance status for your listings.</p>
     </div>
 
     <!-- Interactive Ledger Card -->
     <div class="glass-card p-4">
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-            <h4 class="text-white fw-semibold mb-0">Product Catalog & Ledger Logs</h4>
+            <h4 class="fw-semibold mb-0">Product Catalog & Ledger Logs</h4>
             <button class="btn-premium btn-sm" data-bs-toggle="modal" data-bs-target="#addProductModal">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 Add New Entry
@@ -34,7 +34,7 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-dark table-hover align-middle border-secondary" id="ledgerTable">
+            <table class="table table-hover align-middle" id="ledgerTable">
                 <thead>
                     <tr class="border-bottom border-secondary text-uppercase fs-7 text-muted">
                         <th scope="col" style="width: 60px;">S.No</th>
@@ -144,7 +144,7 @@
         tbody.innerHTML = "";
 
         if (products.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="14" class="text-center text-muted py-5">No products recorded. Click 'Add New Entry' to start.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="14" class="text-center py-5 text-muted fw-semibold">No products</td></tr>`;
             toggleConditionalColumns();
             return;
         }
@@ -158,9 +158,9 @@
             const profitClass = profit >= 0 ? "text-success" : "text-danger";
 
             tr.innerHTML = `
-                <td class="s-no text-white fw-semibold">${index + 1}</td>
+                <td class="s-no fw-semibold">${index + 1}</td>
                 <td>
-                    <input type="text" class="form-control form-control-sm bg-transparent border-0 text-white fw-medium w-100 sku-id-input" value="${p.skuId}" onblur="saveRow(${p.productId})" />
+                    <input type="text" class="form-control form-control-sm bg-transparent border-0 fw-medium w-100 sku-id-input" value="${p.skuId}" onblur="saveRow(${p.productId})" />
                 </td>
                 <td>
                     <div class="position-relative overflow-hidden rounded border border-secondary" style="width: 60px; height: 60px;">
@@ -168,35 +168,35 @@
                     </div>
                 </td>
                 <td>
-                    <input type="number" class="form-control form-control-sm bg-transparent border-0 text-white w-75 stock-input" value="${p.stock}" min="1" onblur="saveRow(${p.productId})" />
+                    <input type="number" class="form-control form-control-sm bg-transparent border-0 w-75 stock-input" value="${p.stock}" min="1" onblur="saveRow(${p.productId})" />
                 </td>
                 <td>
-                    <input type="date" class="form-control form-control-sm bg-transparent border-0 text-white date-of-upload-input" value="${p.dateOfUpload || ''}" onblur="saveRow(${p.productId})" />
+                    <input type="date" class="form-control form-control-sm bg-transparent border-0 date-of-upload-input" value="${p.dateOfUpload || ''}" onblur="saveRow(${p.productId})" />
                 </td>
                 <td>
-                    <input type="text" class="form-control form-control-sm bg-transparent border-0 text-white courier-name-input" value="${p.courierName || ''}" placeholder="Courier" onblur="saveRow(${p.productId})" />
+                    <input type="text" class="form-control form-control-sm bg-transparent border-0 courier-name-input" value="${p.courierName || ''}" placeholder="Courier" onblur="saveRow(${p.productId})" />
                 </td>
                 <td>
-                    <input type="date" class="form-control form-control-sm bg-transparent border-0 text-white date-of-pickup-input" value="${p.dateOfPickup || ''}" onblur="saveRow(${p.productId})" />
+                    <input type="date" class="form-control form-control-sm bg-transparent border-0 date-of-pickup-input" value="${p.dateOfPickup || ''}" onblur="saveRow(${p.productId})" />
                 </td>
                 <td>
-                    <input type="number" class="form-control form-control-sm bg-transparent border-0 text-white invested-amt-input" value="${p.investedAmount}" step="0.01" onblur="saveRow(${p.productId})" />
+                    <input type="number" class="form-control form-control-sm bg-transparent border-0 invested-amt-input" value="${p.investedAmount}" step="0.01" onblur="saveRow(${p.productId})" />
                 </td>
                 <td>
-                    <input type="number" class="form-control form-control-sm bg-transparent border-0 text-white credited-amt-input" value="${p.creditedAmount}" step="0.01" onblur="saveRow(${p.productId})" />
+                    <input type="number" class="form-control form-control-sm bg-transparent border-0 credited-amt-input" value="${p.creditedAmount}" step="0.01" onblur="saveRow(${p.productId})" />
                 </td>
                 <td class="profit-amt ${profitClass} fw-bold">₹${profit.toLocaleString('en-IN')}</td>
                 <td>
-                    <select class="form-select form-select-sm bg-dark border-secondary text-white payment-status-select" onchange="onStatusChange(${p.productId})">
+                    <select class="form-select form-select-sm payment-status-select" onchange="onStatusChange(${p.productId})">
                         <option value="Unscheduled" ${p.paymentStatus === 'Unscheduled' ? 'selected' : ''}>Unscheduled</option>
                         <option value="Pending" ${p.paymentStatus === 'Pending' ? 'selected' : ''}>Pending</option>
                     </select>
                 </td>
                 <td class="conditional-col d-none">
-                    <input type="date" class="form-control form-control-sm bg-dark border-secondary text-white date-of-payment-input" value="${p.dateOfPayment || ''}" onblur="saveRow(${p.productId})" />
+                    <input type="date" class="form-control form-control-sm date-of-payment-input" value="${p.dateOfPayment || ''}" onblur="saveRow(${p.productId})" />
                 </td>
                 <td class="conditional-col d-none">
-                    <select class="form-select form-select-sm bg-dark border-secondary text-white arrived-select" onchange="saveRow(${p.productId})">
+                    <select class="form-select form-select-sm arrived-select" onchange="saveRow(${p.productId})">
                         <option value="No" ${p.arrived === 'No' ? 'selected' : ''}>No</option>
                         <option value="Yes" ${p.arrived === 'Yes' ? 'selected' : ''}>Yes</option>
                     </select>
