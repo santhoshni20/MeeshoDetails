@@ -27,8 +27,8 @@
             <div class="glass-card stat-card p-4">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
-                        <p class="text-muted fs-7 text-uppercase fw-semibold mb-1">Number of Products</p>
-                        <h3 id="statTotalProducts" class="text-white fw-bold mb-0">-</h3>
+                        <p class="stat-card-label fs-7 text-uppercase fw-semibold mb-1">Number of Products</p>
+                        <h3 id="statTotalProducts" class="stat-card-value fw-bold mb-0">-</h3>
                     </div>
                     <div class="stat-icon-wrapper bg-pink-gradient">
                         <span class="fs-4">📦</span>
@@ -42,8 +42,8 @@
             <div class="glass-card stat-card p-4">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
-                        <p class="text-muted fs-7 text-uppercase fw-semibold mb-1">Out Of Stock</p>
-                        <h3 id="statOutOfStock" class="text-white fw-bold mb-0">-</h3>
+                        <p class="stat-card-label fs-7 text-uppercase fw-semibold mb-1">Out Of Stock</p>
+                        <h3 id="statOutOfStock" class="stat-card-value fw-bold mb-0">-</h3>
                     </div>
                     <div class="stat-icon-wrapper bg-orange-gradient">
                         <span class="fs-4">⚠️</span>
@@ -57,8 +57,8 @@
             <div class="glass-card stat-card p-4">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
-                        <p class="text-muted fs-7 text-uppercase fw-semibold mb-1">Total Invested Amount</p>
-                        <h3 id="statTotalInvested" class="text-white fw-bold mb-0">-</h3>
+                        <p class="stat-card-label fs-7 text-uppercase fw-semibold mb-1">Total Invested Amount</p>
+                        <h3 id="statTotalInvested" class="stat-card-value fw-bold mb-0">-</h3>
                     </div>
                     <div class="stat-icon-wrapper bg-blue-gradient">
                         <span class="fs-4">💰</span>
@@ -72,8 +72,8 @@
             <div class="glass-card stat-card p-4">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
-                        <p class="text-muted fs-7 text-uppercase fw-semibold mb-1">Total Profit</p>
-                        <h3 id="statTotalProfit" class="text-white fw-bold mb-0">-</h3>
+                        <p class="stat-card-label fs-7 text-uppercase fw-semibold mb-1">Total Profit</p>
+                        <h3 id="statTotalProfit" class="stat-card-value fw-bold mb-0">-</h3>
                     </div>
                     <div class="stat-icon-wrapper bg-green-gradient">
                         <span class="fs-4">📈</span>
@@ -104,9 +104,9 @@
                     profitEl.textContent = "₹" + stats.totalProfit.toLocaleString('en-IN');
                     
                     if (stats.totalProfit >= 0) {
-                        profitEl.className = "fw-bold mb-0 text-success";
+                        profitEl.className = "stat-card-value fw-bold mb-0 text-success";
                     } else {
-                        profitEl.className = "fw-bold mb-0 text-danger";
+                        profitEl.className = "stat-card-value fw-bold mb-0 text-danger";
                     }
                 } else {
                     console.error("Failed to load dashboard stats: " + res.message);
@@ -127,6 +127,12 @@
     .stat-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    .stat-card-label {
+        color: var(--text-muted) !important;
+    }
+    .stat-card-value {
+        color: var(--text-main) !important;
     }
     .stat-icon-wrapper {
         width: 48px;
