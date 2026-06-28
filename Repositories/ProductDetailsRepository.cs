@@ -119,6 +119,43 @@ namespace MeeshoDetails.Repositories
             return true;
         }
 
+        public async Task<bool> editProduct(updateProductDTO dto)
+        {
+            var product = await _context.products.FirstOrDefaultAsync(p => p.productId == dto.productId);
+            if (product == null) return false;
+
+            product.skuId = dto.skuId;
+            product.stock = dto.stock;
+            product.dateOfUpload = string.IsNullOrEmpty(dto.dateOfUpload) ? null : DateTime.Parse(dto.dateOfUpload);
+            product.courierName = dto.courierName;
+            product.dateOfPickup = string.IsNullOrEmpty(dto.dateOfPickup) ? null : DateTime.Parse(dto.dateOfPickup);
+            product.investedAmount = dto.investedAmount;
+            product.creditedAmount = dto.creditedAmount;
+            product.profitAmount = dto.creditedAmount - dto.investedAmount;
+            product.paymentStatus = dto.paymentStatus;
+            product.dateOfPayment = string.IsNullOrEmpty(dto.dateOfPayment) ? null : DateTime.Parse(dto.dateOfPayment);
+            product.arrived = dto.arrived;
+
+            if (dto.productPhoto != null && dto.productPhoto.Length > 0)
+            {
+                string uploadFolder = Path.Combine(_env.WebRootPath, "Uploads");
+                if (!Directory.Exists(uploadFolder))
+                {
+                    Directory.CreateDirectory(uploadFolder);
+                }
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + dto.productPhoto.FileName;
+                string filePath = Path.Combine(uploadFolder, uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await dto.productPhoto.CopyToAsync(fileStream);
+                }
+                product.productPhoto = "/Uploads/" + uniqueFileName;
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<bool> deleteProduct(int productId)
         {
             var product = await _context.products.FirstOrDefaultAsync(p => p.productId == productId);

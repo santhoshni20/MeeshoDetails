@@ -111,8 +111,99 @@
     </div>
 </div>
 
+<!-- Edit Product Modal -->
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-modal">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="editProductModalLabel">Edit Product Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editProductForm" enctype="multipart/form-data">
+                <input type="hidden" id="editProductId" name="productId" />
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editProductPhoto" class="form-label fs-7 text-uppercase">Product Image</label>
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <img id="editCurrentPhoto" src="" class="rounded border border-secondary object-fit-cover shadow-sm" style="width: 50px; height: 50px; display: none;" />
+                            <input type="file" class="form-control" id="editProductPhoto" name="productPhoto" accept="image/*" />
+                        </div>
+                        <div id="editPhotoPreviewContainer" class="d-none mt-2 p-1 border border-secondary rounded position-relative" style="width: 100px; height: 100px;">
+                            <img id="editPhotoPreview" class="w-100 h-100 object-fit-cover rounded" alt="Selected product preview" />
+                            <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 p-1 m-1 line-height-1 rounded-circle" style="font-size: 8px; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;" onclick="clearEditPhotoSelection()">×</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label for="editSkuId" class="form-label fs-7 text-uppercase">SKU ID</label>
+                            <input type="text" class="form-control" id="editSkuId" name="skuId" required />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="editStock" class="form-label fs-7 text-uppercase">Stock</label>
+                            <input type="number" class="form-control" id="editStock" name="stock" min="1" required />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="editDateOfUpload" class="form-label fs-7 text-uppercase">Date of Upload</label>
+                            <input type="date" class="form-control" id="editDateOfUpload" name="dateOfUpload" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editCourierName" class="form-label fs-7 text-uppercase">Courier Name</label>
+                            <input type="text" class="form-control" id="editCourierName" name="courierName" placeholder="Courier Name" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="editDateOfPickup" class="form-label fs-7 text-uppercase">Date of Pickup</label>
+                            <input type="date" class="form-control" id="editDateOfPickup" name="dateOfPickup" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editInvestedAmount" class="form-label fs-7 text-uppercase">Invested Amount (₹)</label>
+                            <input type="number" class="form-control" id="editInvestedAmount" name="investedAmount" min="0" step="0.01" required />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="editCreditedAmount" class="form-label fs-7 text-uppercase">Credited Amount (₹)</label>
+                            <input type="number" class="form-control" id="editCreditedAmount" name="creditedAmount" min="0" step="0.01" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editPaymentStatus" class="form-label fs-7 text-uppercase">Payment Status</label>
+                            <select class="form-select" id="editPaymentStatus" name="paymentStatus" onchange="toggleEditModalConditionalFields()">
+                                <option value="Unscheduled">Unscheduled</option>
+                                <option value="Pending">Pending</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row edit-conditional-fields d-none">
+                        <div class="col-md-6 mb-3">
+                            <label for="editDateOfPayment" class="form-label fs-7 text-uppercase">Date of Payment</label>
+                            <input type="date" class="form-control" id="editDateOfPayment" name="dateOfPayment" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editArrived" class="form-label fs-7 text-uppercase">Arrived</label>
+                            <select class="form-select" id="editArrived" name="arrived">
+                                <option value="No">No</option>
+                                <option value="Yes">Yes</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-premium">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 @section Scripts {
 <script>
+    window.productsList = [];
+
     document.addEventListener("DOMContentLoaded", function () {
         // Set default date of upload to today
         document.getElementById("dateOfUpload").value = new Date().toISOString().split('T')[0];
@@ -143,6 +234,31 @@
                 clearPhotoSelection();
             }
         });
+
+        // Handle Edit Form Submit
+        document.getElementById("editProductForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            saveEditProduct();
+        });
+
+        // Edit Photo preview listener
+        const editProductPhotoInput = document.getElementById("editProductPhoto");
+        const editPhotoPreviewContainer = document.getElementById("editPhotoPreviewContainer");
+        const editPhotoPreview = document.getElementById("editPhotoPreview");
+
+        editProductPhotoInput.addEventListener("change", function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    editPhotoPreview.src = e.target.result;
+                    editPhotoPreviewContainer.classList.remove("d-none");
+                };
+                reader.readAsDataURL(file);
+            } else {
+                clearEditPhotoSelection();
+            }
+        });
     });
 
     function loadProducts() {
@@ -150,6 +266,7 @@
             .then(res => res.json())
             .then(res => {
                 if (res.statusCode === 200) {
+                    window.productsList = res.data;
                     renderProducts(res.data);
                 } else {
                     alert("Failed to load products: " + res.message);
@@ -225,9 +342,14 @@
                     </select>
                 </td>
                 <td>
-                    <button class="btn btn-sm btn-outline-danger border-0" onclick="deleteProduct(${p.productId})">
-                        🗑️
-                    </button>
+                    <div class="d-flex gap-1 justify-content-center">
+                        <button class="btn btn-sm btn-outline-info border-0" onclick="openEditModal(${p.productId})">
+                            ✏️
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger border-0" onclick="deleteProduct(${p.productId})">
+                            🗑️
+                        </button>
+                    </div>
                 </td>
             `;
 
@@ -382,6 +504,96 @@
         if (productPhotoInput) productPhotoInput.value = "";
         if (photoPreview) photoPreview.src = "";
         if (photoPreviewContainer) photoPreviewContainer.classList.add("d-none");
+    }
+
+    function openEditModal(productId) {
+        const product = window.productsList.find(p => p.productId === productId);
+        if (!product) return;
+
+        // Reset file inputs & previews
+        clearEditPhotoSelection();
+
+        // Populate fields
+        document.getElementById("editProductId").value = product.productId;
+        document.getElementById("editSkuId").value = product.skuId;
+        document.getElementById("editStock").value = product.stock;
+        
+        // Format dates correctly for input elements (yyyy-MM-dd)
+        document.getElementById("editDateOfUpload").value = product.dateOfUpload || "";
+        document.getElementById("editCourierName").value = product.courierName || "";
+        document.getElementById("editDateOfPickup").value = product.dateOfPickup || "";
+        document.getElementById("editInvestedAmount").value = product.investedAmount || 0;
+        document.getElementById("editCreditedAmount").value = product.creditedAmount || 0;
+        document.getElementById("editPaymentStatus").value = product.paymentStatus || "Unscheduled";
+        document.getElementById("editDateOfPayment").value = product.dateOfPayment || "";
+        document.getElementById("editArrived").value = product.arrived || "No";
+
+        // Handle current photo thumbnail
+        const currentPhoto = document.getElementById("editCurrentPhoto");
+        if (product.productPhoto) {
+            currentPhoto.src = product.productPhoto;
+            currentPhoto.style.display = "block";
+        } else {
+            currentPhoto.src = "";
+            currentPhoto.style.display = "none";
+        }
+
+        // Toggle visibility
+        toggleEditModalConditionalFields();
+
+        // Show modal
+        const editModal = new bootstrap.Modal(document.getElementById('editProductModal'));
+        editModal.show();
+    }
+
+    function toggleEditModalConditionalFields() {
+        const status = document.getElementById("editPaymentStatus").value;
+        const conditionalContainer = document.querySelector(".edit-conditional-fields");
+        if (status === "Pending") {
+            conditionalContainer.classList.remove("d-none");
+        } else {
+            conditionalContainer.classList.add("d-none");
+            document.getElementById("editDateOfPayment").value = "";
+            document.getElementById("editArrived").value = "No";
+        }
+    }
+
+    function saveEditProduct() {
+        const formElement = document.getElementById("editProductForm");
+        const formData = new FormData(formElement);
+
+        fetch('/ProductDetails/editProduct', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.statusCode === 200) {
+                // Hide modal and refresh list
+                const modalElement = document.getElementById('editProductModal');
+                const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+                modal.hide();
+                formElement.reset();
+                clearEditPhotoSelection();
+                loadProducts();
+            } else {
+                alert("Error saving edits: " + res.message);
+            }
+        })
+        .catch(err => {
+            console.error("Error saving edits:", err);
+            alert("Error sending request to server.");
+        });
+    }
+
+    function clearEditPhotoSelection() {
+        const editProductPhotoInput = document.getElementById("editProductPhoto");
+        const editPhotoPreviewContainer = document.getElementById("editPhotoPreviewContainer");
+        const editPhotoPreview = document.getElementById("editPhotoPreview");
+
+        if (editProductPhotoInput) editProductPhotoInput.value = "";
+        if (editPhotoPreview) editPhotoPreview.src = "";
+        if (editPhotoPreviewContainer) editPhotoPreviewContainer.classList.add("d-none");
     }
 </script>
 }

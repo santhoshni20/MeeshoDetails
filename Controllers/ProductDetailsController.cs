@@ -120,6 +120,41 @@ namespace MeeshoDetails.Controllers
             }
         }
 
+        // API Endpoint to edit an existing product with file upload support
+        [HttpPost]
+        public async Task<IActionResult> editProduct([FromForm] updateProductDTO dto)
+        {
+            try
+            {
+                var success = await _productRepository.editProduct(dto);
+                if (success)
+                {
+                    return Json(new apiResponseDTO
+                    {
+                        statusCode = 200,
+                        message = "Product updated successfully"
+                    });
+                }
+                else
+                {
+                    return Json(new apiResponseDTO
+                    {
+                        statusCode = 404,
+                        message = "Product not found"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new apiResponseDTO
+                {
+                    statusCode = 500,
+                    message = "Failed to update product",
+                    errorDetails = ex.Message
+                });
+            }
+        }
+
         // API Endpoint to delete a product
         [HttpPost]
         public async Task<IActionResult> deleteProductItem(int productId)
