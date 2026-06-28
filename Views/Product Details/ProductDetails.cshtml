@@ -80,6 +80,10 @@
                     <div class="mb-3">
                         <label for="productPhoto" class="form-label fs-7 text-uppercase">Product Image</label>
                         <input type="file" class="form-control" id="productPhoto" name="productPhoto" accept="image/*" />
+                        <div id="photoPreviewContainer" class="d-none mt-2 p-1 border border-secondary rounded position-relative" style="width: 100px; height: 100px;">
+                            <img id="photoPreview" class="w-100 h-100 object-fit-cover rounded" alt="Selected product preview" />
+                            <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 p-1 m-1 line-height-1 rounded-circle" style="font-size: 8px; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;" onclick="clearPhotoSelection()">×</button>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label for="skuId" class="form-label fs-7 text-uppercase">SKU ID</label>
@@ -119,6 +123,25 @@
         document.getElementById("addProductForm").addEventListener("submit", function (e) {
             e.preventDefault();
             saveProduct();
+        });
+
+        // Photo preview listener
+        const productPhotoInput = document.getElementById("productPhoto");
+        const photoPreviewContainer = document.getElementById("photoPreviewContainer");
+        const photoPreview = document.getElementById("photoPreview");
+
+        productPhotoInput.addEventListener("change", function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    photoPreview.src = e.target.result;
+                    photoPreviewContainer.classList.remove("d-none");
+                };
+                reader.readAsDataURL(file);
+            } else {
+                clearPhotoSelection();
+            }
         });
     });
 
@@ -320,6 +343,7 @@
                 const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
                 modal.hide();
                 formElement.reset();
+                clearPhotoSelection();
                 // Reset default date
                 document.getElementById("dateOfUpload").value = new Date().toISOString().split('T')[0];
                 loadProducts();
@@ -348,6 +372,16 @@
             }
         })
         .catch(err => console.error("Error deleting product:", err));
+    }
+
+    function clearPhotoSelection() {
+        const productPhotoInput = document.getElementById("productPhoto");
+        const photoPreviewContainer = document.getElementById("photoPreviewContainer");
+        const photoPreview = document.getElementById("photoPreview");
+
+        if (productPhotoInput) productPhotoInput.value = "";
+        if (photoPreview) photoPreview.src = "";
+        if (photoPreviewContainer) photoPreviewContainer.classList.add("d-none");
     }
 </script>
 }
