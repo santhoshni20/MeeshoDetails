@@ -221,6 +221,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Table styles */
 .table, .table > :not(caption) > * > * {
   color: var(--text-main) !important;
+  background-color: transparent !important;
 }
 
 .table th {
