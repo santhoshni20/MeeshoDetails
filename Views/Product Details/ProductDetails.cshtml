@@ -25,12 +25,20 @@
 
     <!-- Interactive Ledger Card -->
     <div class="glass-card p-4">
-        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
             <h4 class="fw-semibold mb-0">Product Catalog & Ledger Logs</h4>
-            <button class="btn-premium btn-sm" data-bs-toggle="modal" data-bs-target="#addProductModal">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                Add New Entry
-            </button>
+            <div class="d-flex align-items-center gap-3">
+                <div class="position-relative" style="width: 280px;">
+                    <input type="text" id="tableSearchInput" class="form-control form-control-sm ps-5 border-secondary rounded-pill bg-transparent" placeholder="Search SKU ID or Courier..." style="padding-top: 8px; padding-bottom: 8px;" />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search text-muted position-absolute start-0 top-50 translate-middle-y ms-3" viewBox="0 0 16 16">
+                      <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                    </svg>
+                </div>
+                <button class="btn-premium btn-sm" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Add New Entry
+                </button>
+            </div>
         </div>
 
         <div class="table-responsive">
@@ -211,6 +219,15 @@
         
         loadProducts();
 
+        // Handle Search Input
+        const searchInput = document.getElementById("tableSearchInput");
+        if (searchInput) {
+            searchInput.addEventListener("input", function () {
+                const query = this.value.toLowerCase().trim();
+                filterTable(query);
+            });
+        }
+
         // Handle Form Submit
         document.getElementById("addProductForm").addEventListener("submit", function (e) {
             e.preventDefault();
@@ -268,7 +285,13 @@
             .then(res => {
                 if (res.statusCode === 200) {
                     window.productsList = res.data;
-                    renderProducts(res.data);
+                    const searchInput = document.getElementById("tableSearchInput");
+                    const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
+                    if (query) {
+                        filterTable(query);
+                    } else {
+                        renderProducts(res.data);
+                    }
                 } else {
                     alert("Failed to load products: " + res.message);
                 }
@@ -276,8 +299,20 @@
             .catch(err => {
                 console.error("Error loading products:", err);
                 document.getElementById("ledgerTableBody").innerHTML = 
-                    `<tr><td colspan="14" class="text-center text-danger py-4">Error loading ledger data from server.</td></tr>`;
+                    `<tr><td colspan="15" class="text-center text-danger py-4">Error loading ledger data from server.</td></tr>`;
             });
+    }
+
+    function filterTable(query) {
+        if (!window.productsList) return;
+        
+        const filtered = window.productsList.filter(p => {
+            const sku = (p.skuId || "").toLowerCase();
+            const courier = (p.courierName || "").toLowerCase();
+            return sku.includes(query) || courier.includes(query);
+        });
+        
+        renderProducts(filtered);
     }
 
     function renderProducts(products) {
@@ -486,6 +521,21 @@
                     profitCell.className = "profit-amt text-success fw-bold";
                 } else {
                     profitCell.className = "profit-amt text-danger fw-bold";
+                }
+
+                // Update window.productsList cache
+                const cachedProd = window.productsList.find(item => item.productId === rowId);
+                if (cachedProd) {
+                    cachedProd.skuId = skuId;
+                    cachedProd.stock = stock;
+                    cachedProd.dateOfUpload = dateOfUpload;
+                    cachedProd.courierName = courierName;
+                    cachedProd.dateOfPickup = dateOfPickup;
+                    cachedProd.investedAmount = investedAmount;
+                    cachedProd.creditedAmount = creditedAmount;
+                    cachedProd.paymentStatus = paymentStatus;
+                    cachedProd.dateOfPayment = dateOfPayment;
+                    cachedProd.arrived = arrived;
                 }
             } else {
                 console.error("Save row failed: ", res.message);
