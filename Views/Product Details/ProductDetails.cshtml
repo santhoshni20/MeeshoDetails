@@ -41,6 +41,7 @@
                         <th scope="col">SKU ID</th>
                         <th scope="col" style="width: 100px;">Photo</th>
                         <th scope="col">Stock</th>
+                        <th scope="col" style="width: 100px;">Stock End</th>
                         <th scope="col">Upload Date</th>
                         <th scope="col">Courier</th>
                         <th scope="col">Pickup Date</th>
@@ -56,7 +57,7 @@
                 <tbody id="ledgerTableBody">
                     <!-- Loaded dynamically via AJAX -->
                     <tr id="loadingRow">
-                        <td colspan="14" class="text-center text-muted py-5">
+                        <td colspan="15" class="text-center text-muted py-5">
                             <div class="spinner-border spinner-border-sm text-pink me-2" role="status"></div>
                             Loading product ledger details...
                         </td>
@@ -140,7 +141,7 @@
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="editStock" class="form-label fs-7 text-uppercase">Stock</label>
-                            <input type="number" class="form-control" id="editStock" name="stock" min="1" required />
+                            <input type="number" class="form-control" id="editStock" name="stock" min="0" required />
                         </div>
                     </div>
                     <div class="row">
@@ -284,7 +285,7 @@
         tbody.innerHTML = "";
 
         if (products.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="14" class="text-center py-5 text-muted fw-semibold">No products</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="15" class="text-center py-5 text-muted fw-semibold">No products</td></tr>`;
             toggleConditionalColumns();
             return;
         }
@@ -308,7 +309,12 @@
                     </div>
                 </td>
                 <td>
-                    <input type="number" class="form-control form-control-sm bg-transparent border-0 w-75 stock-input" value="${p.stock}" min="1" onblur="saveRow(${p.productId})" />
+                    <input type="number" class="form-control form-control-sm bg-transparent border-0 w-75 stock-input" value="${p.stock}" min="0" onblur="onStockInputChange(${p.productId})" />
+                </td>
+                <td>
+                    <div class="form-check form-switch d-inline-block">
+                        <input class="form-check-input stock-end-switch" type="checkbox" role="switch" id="stockEndSwitch_${p.productId}" ${p.stock === 0 ? 'checked' : ''} onchange="onStockEndToggle(${p.productId}, this)" style="cursor: pointer;" />
+                    </div>
                 </td>
                 <td>
                     <input type="date" class="form-control form-control-sm bg-transparent border-0 date-of-upload-input" value="${p.dateOfUpload || ''}" onblur="saveRow(${p.productId})" />
@@ -395,12 +401,50 @@
         saveRow(rowId);
     }
 
+    function onStockEndToggle(productId, switchEl) {
+        const row = document.getElementById("row_" + productId);
+        if (!row) return;
+        const stockInput = row.querySelector(".stock-input");
+        
+        if (switchEl.checked) {
+            stockInput.value = 0;
+        } else {
+            if (parseInt(stockInput.value) === 0) {
+                stockInput.value = 1;
+            }
+        }
+        saveRow(productId);
+    }
+
+    function onStockInputChange(productId) {
+        const row = document.getElementById("row_" + productId);
+        if (!row) return;
+        const stockInput = row.querySelector(".stock-input");
+        const stockEndSwitch = row.querySelector(".stock-end-switch");
+        
+        let stock = parseInt(stockInput.value);
+        if (isNaN(stock) || stock < 0) {
+            stock = 0;
+            stockInput.value = 0;
+        }
+        
+        if (stock === 0) {
+            stockEndSwitch.checked = true;
+        } else {
+            stockEndSwitch.checked = false;
+        }
+        saveRow(productId);
+    }
+
     function saveRow(rowId) {
         const row = document.getElementById("row_" + rowId);
         if (!row) return;
 
         const skuId = row.querySelector(".sku-id-input").value;
-        const stock = parseInt(row.querySelector(".stock-input").value) || 1;
+        let stock = parseInt(row.querySelector(".stock-input").value);
+        if (isNaN(stock) || stock < 0) {
+            stock = 0;
+        }
         const dateOfUpload = row.querySelector(".date-of-upload-input").value;
         const courierName = row.querySelector(".courier-name-input").value;
         const dateOfPickup = row.querySelector(".date-of-pickup-input").value;
@@ -631,5 +675,27 @@
 
     .text-pink {
         color: var(--accent-pink);
+    }
+
+    /* Premium Custom Switch Styling */
+    .form-switch .form-check-input {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba(255, 255, 255, 0.45)'/%3e%3c/svg%3e") !important;
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        border-color: rgba(255, 255, 255, 0.2) !important;
+        height: 1.5em;
+        width: 2.8em;
+        transition: background-position .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+    
+    .form-switch .form-check-input:focus {
+        border-color: var(--accent-pink) !important;
+        box-shadow: 0 0 0 0.25rem rgba(255, 71, 126, 0.25) !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23ff477e'/%3e%3c/svg%3e") !important;
+    }
+    
+    .form-switch .form-check-input:checked {
+        background-color: var(--accent-pink) !important;
+        border-color: var(--accent-pink) !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e") !important;
     }
 </style>
